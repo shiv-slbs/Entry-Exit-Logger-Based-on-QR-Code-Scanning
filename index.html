@@ -80,26 +80,51 @@
     }
 
     // send barcode to Apps Script
-    async function sendToSheet(barcode) {
-      const el = document.getElementById('statusText');
-      el.className = 'status sending';
-      el.textContent = 'Sending to Google Sheet...';
+async function sendToSheet(barcode) {
+  const el = document.getElementById('statusText');
+  el.className = 'status sending';
+  el.textContent = 'Sending to Google Sheet...';
 
-      try {
-        await fetch(APPS_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ barcode })
-        });
-        // no-cors = opaque response, assume success
-        el.className = 'status success';
-        el.textContent = 'Sent to Google Sheet!';
-      } catch (err) {
-        el.className = 'status error';
-        el.textContent = 'Error: ' + err.message;
-      }
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ barcode })
+    });
+
+    const text = await res.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid server response");
     }
+
+    if (data.success) {
+      el.className = 'status success';
+      el.textContent = data.message;
+
+      // ✅ ONLY update history on success
+      scanHistory.unshift({
+        time: new Date().toLocaleTimeString(),
+        userId: barcode,
+        status: data.message   // e.g. "Shivam marked IN"
+      });
+
+      updateHistory();
+
+    } else {
+      el.className = 'status error';
+      el.textContent = data.message;
+      // ❌ Do NOT update history
+    }
+
+  } catch (err) {
+    el.className = 'status error';
+    el.textContent = 'Error: ' + err.message;
+  }
+}
 
     // on successful scan
     function onScanSuccess(decoded) {
@@ -121,17 +146,19 @@
       updateHistory();
       sendToSheet(decoded);
     }
+    
+function updateHistory() {
+  document.getElementById('historySection').style.display = 'block';
 
-    function updateHistory() {
-      document.getElementById('historySection').style.display = 'block';
-      document.getElementById('historyList').innerHTML =
-        scanHistory.slice(0, 20).map(i =>
-          `<div class="history-item">
-            <span>${i.barcode}</span>
-            <span style="color:#64748b">${i.time}</span>
-          </div>`
-        ).join('');
-    }
+  document.getElementById('historyList').innerHTML =
+    scanHistory.slice(0, 20).map(i =>
+      `<div class="history-item">
+        <span>${i.time}</span>
+        <span>${i.userId}</span>
+        <span style="color:#22d3ee">${i.status}</span>
+      </div>`
+    ).join('');
+}
 
     // start camera scanner
     const scanner = new Html5Qrcode('reader');
