@@ -36,6 +36,41 @@
       margin: 5px 0; display: flex;
       justify-content: space-between; font-size: 14px;
     }
+
+    .history-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Top row always horizontal */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* MOBILE VIEW (default) */
+.response {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* DESKTOP VIEW */
+@media (min-width: 768px) {
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .top-row {
+    gap: 20px;
+  }
+
+  .response {
+    margin-top: 0;
+  }
+}
   </style>
 </head>
 <body>
@@ -133,14 +168,19 @@ async function sendToSheet(barcode) {
 function updateHistory() {
   document.getElementById('historySection').style.display = 'block';
 
-  document.getElementById('historyList').innerHTML =
-    scanHistory.slice(0, 20).map(i =>
-      `<div class="history-item">
-        <span>${i.time}</span>
-        <span>${i.userId}</span>
-        <span style="color:#22d3ee">${i.status}</span>
-      </div>`
-    ).join('');
+document.getElementById('historyList').innerHTML =
+  scanHistory.slice(0, 50).map(i =>
+    `<div class="history-item">
+      
+      <div class="top-row">
+        <span class="time">${i.time}</span>
+        <span class="user">${i.userId}</span>
+      </div>
+
+      <div class="response">${i.status}</div>
+
+    </div>`
+  ).join('');
 }
 
     // start camera scanner
