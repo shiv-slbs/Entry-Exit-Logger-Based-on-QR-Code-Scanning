@@ -83,37 +83,36 @@
 async function sendToSheet(barcode) {
   const el = document.getElementById('statusText');
   el.className = 'status sending';
-  el.textContent = 'Sending to Google Sheet...';
+  el.textContent = 'Processing...';
 
   try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors', // keep this to avoid CORS failure
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ barcode })
-    });
+    const res = await fetch(`${APPS_SCRIPT_URL}?userId=${encodeURIComponent(barcode)}`);
 
-    // ⚠️ We cannot read backend response here
-    // So we simulate success ONLY after request completes
+    const data = await res.json();
 
-    el.className = 'status success';
-    el.textContent = 'Processed (check sheet)';
+    if (data.success) {
+      el.className = 'status success';
+    } else {
+      el.className = 'status error';
+    }
 
-    // ✅ Update history AFTER request completes
-    scanHistory.unshift({
-      time: new Date().toLocaleTimeString(),
-      userId: barcode,
-      status: "Processed"
-    });
+    el.textContent = data.message;
 
-    updateHistory();
+    // ✅ Update history only on success
+    if (data.success) {
+      scanHistory.unshift({
+        time: new Date().toLocaleTimeString(),
+        userId: barcode,
+        status: data.message
+      });
+      updateHistory();
+    }
 
   } catch (err) {
     el.className = 'status error';
-    el.textContent = 'Error: ' + err.message;
+    el.textContent = 'Network Error';
   }
 }
-
     
     // on successful scan
     function onScanSuccess(decoded) {
@@ -128,11 +127,6 @@ async function sendToSheet(barcode) {
       document.getElementById('resultBox').style.display = 'block';
       document.getElementById('barcodeValue').textContent = decoded;
 
-      scanHistory.unshift({
-        barcode: decoded,
-        time: new Date().toLocaleTimeString()
-      });
-      updateHistory();
       sendToSheet(decoded);
     }
     
