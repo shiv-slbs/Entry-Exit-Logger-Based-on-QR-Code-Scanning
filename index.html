@@ -44,6 +44,8 @@
   margin-bottom: 8px;
   background: #1e293b;
   color: white;
+  display: flex;
+  flex-direction: row;
 }
 
 /* Top row */
@@ -64,7 +66,7 @@
 .response {
   margin-top: 6px;
   font-size: 14px;
-  color: #9ca3af;
+  color: #23BA26;
   word-break: break-word; /* 🔥 prevents overflow */
 }
 
@@ -74,15 +76,18 @@
     display: grid;
     grid-template-columns: 1fr; /* one column */
     align-items: center;
+    flex-direction: column;
     gap: 10px;
   }
 
   .top-row {
     display: contents; /* 🔥 flattens layout into grid */
+    order: 1;
   }
 
   .response {
     margin-top: 0;
+    order: 1;
   }
 }
   
