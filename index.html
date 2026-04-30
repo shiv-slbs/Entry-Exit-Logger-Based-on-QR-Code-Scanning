@@ -37,40 +37,55 @@
       justify-content: space-between; font-size: 14px;
     }
 
-    .history-item {
-  padding: 10px;
+.history-item {
+  padding: 12px;
   border-bottom: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: #1e293b;
+  color: white;
 }
 
-/* Top row always horizontal */
+/* Top row */
 .top-row {
   display: flex;
   justify-content: space-between;
-}
-
-/* MOBILE VIEW (default) */
-.response {
-  margin-top: 4px;
+  gap: 10px;
   font-size: 14px;
-  color: #555;
+  flex-wrap: wrap; /* 🔥 important */
 }
 
-/* DESKTOP VIEW */
+/* Fix timestamp wrapping */
+.time {
+  white-space: nowrap;
+}
+
+/* Response text */
+.response {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #9ca3af;
+  word-break: break-word; /* 🔥 prevents overflow */
+}
+
+/* DESKTOP FIX */
 @media (min-width: 768px) {
   .history-item {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 150px 120px 1fr; /* 🔥 clean alignment */
     align-items: center;
+    gap: 10px;
   }
 
   .top-row {
-    gap: 20px;
+    display: contents; /* 🔥 flattens layout into grid */
   }
 
   .response {
     margin-top: 0;
   }
 }
+  
   </style>
 </head>
 <body>
