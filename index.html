@@ -39,46 +39,43 @@
 
 .history-item {
   padding: 12px;
-  border-bottom: 1px solid #ddd;
   border-radius: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   background: #1e293b;
   color: white;
 }
 
-/* Top row */
-.top-row {
+/* ✅ FIRST LINE: always horizontal */
+.row1 {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  font-size: 14px;
-  flex-wrap: wrap; /* 🔥 important */
+  align-items: center;
 }
 
-/* Fix timestamp wrapping */
-.time {
+/* Keep both in same line ALWAYS */
+.time, .user {
   white-space: nowrap;
+  font-size: 14px;
 }
 
-/* Response text */
+/* ✅ SECOND LINE */
 .response {
   margin-top: 6px;
   font-size: 14px;
   color: #9ca3af;
-  word-break: break-word; /* 🔥 prevents overflow */
 }
 
-/* DESKTOP FIX */
+/* ✅ DESKTOP: convert to single row */
 @media (min-width: 768px) {
   .history-item {
-    display: grid;
-    grid-template-columns: 150px 120px 1fr; /* 🔥 clean alignment */
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
   }
 
-  .top-row {
-    display: contents; /* 🔥 flattens layout into grid */
+  .row1 {
+    gap: 20px;
+    justify-content: flex-start;
   }
 
   .response {
@@ -187,7 +184,7 @@ document.getElementById('historyList').innerHTML =
   scanHistory.slice(0, 50).map(i =>
     `<div class="history-item">
       
-      <div class="top-row">
+      <div class="row1">
         <span class="time">${i.time}</span>
         <span class="user">${i.userId}</span>
       </div>
